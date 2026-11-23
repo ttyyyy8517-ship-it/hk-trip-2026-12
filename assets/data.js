@@ -104,13 +104,13 @@ window.TRIP = {
       id: "bochk", day: 2, type: "meet", co: "bochk", badge: "银", time: "15:30", end: "16:30",
       name: "中银香港", code: "2388.HK", sub: "中环 · 花园道 1 号",
       addr: "香港中西区中环花园道 1 号",
-      note: "最后一场，16:15 前把问题问完；16:45 出发去机场。",
+      note: "最后一场，16:15 前把问题问完；16:45 集体前往西九龙高铁站返深。",
       lat: 22.2794, lng: 114.1616
     },
     {
-      id: "airport", day: 2, type: "move", badge: "机", time: "16:45", end: "出发",
-      name: "前往香港机场", sub: "打车 35–40 分钟", addr: "中环花园道 → 香港国际机场",
-      note: "建议 19:30 后起飞，到机场留 90 分钟以上。",
+      id: "return", day: 2, type: "move", badge: "返", time: "16:45", end: "",
+      name: "集体前往西九龙高铁站返深", sub: "中环 → 西九龙站", addr: "香港西九龙站",
+      note: "会议结束后统一前往西九龙站，乘高铁返深；具体车次待定。",
       map: false
     }
   ],

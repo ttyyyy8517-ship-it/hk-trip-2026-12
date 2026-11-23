@@ -50,7 +50,7 @@
       <div class="mp-time">${dayLabel(s.day)} ${timeText(s)}</div>
       <div class="mp-name">${s.name}${s.code ? `<em>${s.code}</em>` : ""}</div>
       <div class="mp-addr">${s.addr}</div>
-      ${s.co ? `<a class="mp-btn" href="company.html?co=${s.co}">查看公司资料 →</a>` : ""}
+      ${s.co ? `<button class="mp-btn" data-open-co="${s.co}">查看公司资料 →</button>` : ""}
     </div>`;
   }
 
@@ -136,13 +136,40 @@
 
   /* ---------- company cards ---------- */
   $("#companyGrid").innerHTML = T.companies.map(c=>`
-    <a class="co-card" href="company.html?co=${c.id}">
+    <article class="co-card" data-co="${c.id}">
       <div class="when">${c.when}</div>
       <h3>${c.name}<small>${c.code}</small></h3>
       <p>${c.line}</p>
       <div class="chips"><span>一页纸</span><span>调研提纲</span><span>股价估值</span></div>
-      <span class="go">打开资料 →</span>
-    </a>`).join("");
+      <span class="go">展开资料 <i>+</i></span>
+    </article>`).join("");
+
+  /* ---------- company expand ---------- */
+  let activeCo = null;
+  function openCompany(id){
+    const c = (window.COMPANIES || {})[id];
+    if (!c) return;
+    if (activeCo === id && !$("#coExpand").hidden) { closeCompany(); return; }
+    activeCo = id;
+    $$(".co-card").forEach(el=>el.classList.toggle("on", el.dataset.co === id));
+    const panel = $("#coExpand");
+    panel.hidden = false;
+    window.CompanyUI.render(c, $("#coExpandBody"));
+    setTimeout(()=>panel.scrollIntoView({behavior: "smooth", block: "start"}), 60);
+  }
+  function closeCompany(){
+    activeCo = null;
+    $("#coExpand").hidden = true;
+    $("#coExpandBody").innerHTML = "";
+    if (window.CompanyUI) window.CompanyUI.close();
+    $$(".co-card").forEach(el=>el.classList.remove("on"));
+  }
+  $$(".co-card").forEach(el=>el.onclick = ()=>openCompany(el.dataset.co));
+  document.addEventListener("click", e=>{
+    const b = e.target.closest("[data-open-co]");
+    if (b) { map.closePopup(); openCompany(b.dataset.openCo); }
+    if (e.target.closest("#coExpand [data-close]")) closeCompany();
+  });
 
   /* ---------- nav active ---------- */
   const secs = ["travel", "map-sec", "companies"].map(id=>document.getElementById(id));
