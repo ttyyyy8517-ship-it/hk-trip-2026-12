@@ -33,9 +33,9 @@ window.TRIP = {
   ],
   stops: [
     {
-      id: "futian", day: 1, type: "move", badge: "福", time: "12:20", end: "集合",
+      id: "futian", day: 1, type: "move", badge: "福", time: "12:30", end: "集合",
       name: "福田站集合", sub: "深圳福田站", addr: "深圳福田站候车厅",
-      note: "12:20 候车厅集合，12:50 进闸；G5857 13:09 发车。",
+      note: "12:30 候车厅集合，12:50 进闸；G5857 13:09 发车。",
       map: false
     },
     {
@@ -120,7 +120,7 @@ window.TRIP = {
   rail: {
     date: "12/2 周三", time: "13:09", train: "G5857", from: "福田站", to: "香港西九龙",
     dur: "14–16 分钟", price: "¥68–75",
-    note: "12:20 福田站候车厅集合，12:50 进闸；西九龙一地两检预留 20–30 分钟。"
+    note: "12:30 福田站候车厅集合，12:50 进闸；西九龙一地两检预留 20–30 分钟。"
   },
   companies: [
     { id: "taikoo", name: "太古地产", code: "1972.HK", when: "12/2 周三 15:30", line: "租金还在跌、股价已经涨；问港写租金底、内地同店、股息来源。" },
