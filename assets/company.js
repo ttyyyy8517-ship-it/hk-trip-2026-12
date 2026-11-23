@@ -1,128 +1,197 @@
-const $=(s,el=document)=>el.querySelector(s);
-const $$=(s,el=document)=>[...el.querySelectorAll(s)];
-
-/* fin bars */
 (function(){
-  const years=['2021','2022','2023','2024','2025','2026E'];
-  const pi=[74.82,74.09,75.25,69.00,67.95,69.0];
-  const dv=[55.58,58.50,61.43,63.75,66.21,68.9];
-  const max=80;
-  const box=$('#fin');
-  box.innerHTML=years.map((y,i)=>`<div class="yr" title="${y} 基本溢利 ${pi[i].toFixed(2)}E / 股息 ${dv[i].toFixed(2)}E">
-    <div class="bars2">
-      <div class="b1" style="height:${pi[i]/max*100}%"></div>
-      <div class="b2" style="height:${dv[i]/max*100}%"></div>
-    </div>
-    <div class="lb">${y}</div>
-  </div>`).join('');
-})();
+  const $ = (s, el=document)=>el.querySelector(s);
+  const $$ = (s, el=document)=>[...el.querySelectorAll(s)];
+  const params = new URLSearchParams(location.search);
+  const id = params.get("co") || "taikoo";
+  const c = (window.COMPANIES || {})[id];
 
-/* price chart */
-const PRICE=[["20250102",15.54],["20250106",15.28],["20250113",15.16],["20250120",15.8],["20250127",15.48],["20250203",15.48],["20250210",15.16],["20250217",15.78],["20250224",15.48],["20250303",15.46],["20250310",16.08],["20250317",16.92],["20250324",17.06],["20250331",17.06],["20250407",15.52],["20250414",15.88],["20250422",16.2],["20250428",16.82],["20250506",16.62],["20250512",16.8],["20250519",16.88],["20250526",17.0],["20250602",17.26],["20250609",18.34],["20250616",18.56],["20250623",18.76],["20250630",19.6],["20250707",19.68],["20250714",19.82],["20250721",20.25],["20250728",20.7],["20250804",20.66],["20250811",21.1],["20250818",20.62],["20250825",20.96],["20250901",21.18],["20250908",21.26],["20250915",22.18],["20250922",22.06],["20250929",21.54],["20251006",21.34],["20251013",21.72],["20251020",21.96],["20251027",21.5],["20251103",21.58],["20251110",22.02],["20251117",22.6],["20251124",22.0],["20251201",21.1],["20251208",21.1],["20251215",21.24],["20251222",21.0],["20251229",20.94],["20260105",20.86],["20260112",22.18],["20260119",22.94],["20260126",23.2],["20260202",23.22],["20260209",25.8],["20260216",25.04],["20260223",26.04],["20260227",27.0],["20260302",26.46],["20260309",24.3],["20260316",24.64],["20260323",23.28],["20260330",23.62],["20260408",24.24],["20260413",24.74],["20260420",25.02],["20260427",24.62],["20260504",25.02],["20260511",25.42],["20260518",23.88],["20260526",23.18],["20260601",22.6],["20260608",21.64],["20260615",21.66],["20260622",20.52],["20260629",20.64],["20260702",20.4],["20260706",21.18],["20260713",21.16],["20260720",22.18],["20260727",23.44],["20260803",23.86],["20260810",24.04],["20260817",24.26],["20260824",25.26],["20260831",23.98],["20260907",24.42],["20260914",24.3],["20260921",24.44],["20260928",24.32],["20261005",23.76],["20261012",24.3],["20261020",24.48],["20261026",24.52],["20261102",25.6],["20261109",26.4],["20261116",25.64],["20261123",25.46]];
-
-﻿(function(){
-  const svg=document.getElementById('pc');
-  if(!svg) return;
-  const tip=document.getElementById('pctip');
-  const n=PRICE.length;
-
-  function draw(){
-    const mob=window.innerWidth<=820;
-    const W=mob?360:780, H=mob?270:320;
-    const L=mob?34:48, R=mob?12:18, T=mob?22:26, B=mob?30:38;
-    const lo=15, hi=28;
-    const X=i=>L+(W-L-R)*i/(n-1);
-    const Y=v=>T+(H-T-B)*(hi-v)/(hi-lo);
-    svg.setAttribute('viewBox','0 0 '+W+' '+H);
-
-    let g='<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d4f7d" stop-opacity=".2"/><stop offset="1" stop-color="#1d4f7d" stop-opacity=".01"/></linearGradient></defs>';
-    const gl = [16,20,24,28];
-    gl.forEach(v=>{
-      g+=`<line x1="${L}" y1="${Y(v)}" x2="${W-R}" y2="${Y(v)}" stroke="#edf0f4" stroke-width="1"/>`;
-      g+=`<text x="${L-7}" y="${Y(v)+3.5}" text-anchor="end" font-size="${mob?10.5:10}" fill="#7f8a9a" font-family="Georgia,serif">${v}</text>`;
-    });
-
-    const pts=PRICE.map((p,i)=>`${X(i).toFixed(1)},${Y(p[1]).toFixed(1)}`);
-    g+=`<polygon points="${L},${H-B} ${pts.join(' ')} ${W-R},${H-B}" fill="url(#ag)"/>`;
-    g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="#0d2b4a" stroke-width="${mob?2.4:2}" stroke-linejoin="round" stroke-linecap="round"/>`;
-
-    const labels = mob
-      ? [["20250102","2025.01"],["20260105","2026.01"],["20261123","11.23"]]
-      : [["20250102","2025.01"],["20250707","2025.07"],["20260105","2026.01"],["20260706","2026.07"],["20261123","11.23"]];
-    labels.forEach(([d,t],k)=>{
-      const i=PRICE.findIndex(p=>p[0]===d); if(i<0)return;
-      const anchor = k===labels.length-1 ? 'end' : 'middle';
-      g+=`<text x="${X(i)}" y="${H-10}" text-anchor="${anchor}" font-size="${mob?10.5:10}" fill="#7f8a9a" font-family="Georgia,serif">${t}</text>`;
-    });
-
-    const marks=[
-      {d:"20260227",t:"27.00",s:"52 周高",up:true},
-      {d:"20260702",t:"20.40",s:"52 周低",up:false},
-      {d:"20261123",t:"25.46",s:"现价",up:true}
-    ];
-    marks.forEach((m,idx)=>{
-      const i=PRICE.findIndex(p=>p[0]===m.d); if(i<0)return;
-      const cx=X(i), cy=Y(PRICE[i][1]);
-      g+=`<circle cx="${cx}" cy="${cy}" r="${mob?3.4:3.6}" fill="#0d2b4a" stroke="#fff" stroke-width="2"/>`;
-      const last = idx===marks.length-1;
-      const lx = last ? cx-8 : cx;
-      const anchor = last ? 'end' : 'middle';
-      const ty = m.up ? cy-11 : cy+18;
-      g+=`<text x="${lx}" y="${ty}" text-anchor="${anchor}" font-size="${mob?11:11}" font-weight="700" fill="#0d2b4a" font-family="Georgia,serif">${m.t}</text>`;
-      g+=`<text x="${lx}" y="${m.up?ty-11:ty+11}" text-anchor="${anchor}" font-size="${mob?9:9.5}" fill="#7f8a9a">${m.s}</text>`;
-    });
-
-    g+=`<line id="cross" x1="0" y1="${T}" x2="0" y2="${H-B}" stroke="#b08a52" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>`;
-    g+=`<circle id="hdot" r="4" fill="#b08a52" stroke="#fff" stroke-width="2" opacity="0"/>`;
-    g+=`<rect id="hover" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/>`;
-    svg.innerHTML=g;
-
-    const cross=document.getElementById('cross'), hdot=document.getElementById('hdot');
-    const hover=document.getElementById('hover');
-    function move(e){
-      const r=svg.getBoundingClientRect();
-      const box=svg.parentElement.getBoundingClientRect();
-      const px=(e.clientX-r.left)/r.width*W;
-      let i=Math.round((px-L)/((W-L-R)/(n-1)));
-      i=Math.max(0,Math.min(n-1,i));
-      const cx=X(i), cy=Y(PRICE[i][1]);
-      cross.setAttribute('x1',cx); cross.setAttribute('x2',cx); cross.setAttribute('opacity','.55');
-      hdot.setAttribute('cx',cx); hdot.setAttribute('cy',cy); hdot.setAttribute('opacity','1');
-      const d=PRICE[i][0];
-      tip.innerHTML=`<b>${PRICE[i][1].toFixed(2)}</b><span>${d.slice(0,4)}.${d.slice(4,6)}.${d.slice(6)}</span>`;
-      tip.style.display='block';
-      tip.style.left=(e.clientX-box.left)+'px';
-      tip.style.top=(r.top-box.top+cy/H*r.height)+'px';
-    }
-    function leave(){cross.setAttribute('opacity','0');hdot.setAttribute('opacity','0');tip.style.display='none';}
-    hover.addEventListener('pointermove',move);
-    hover.addEventListener('pointerleave',leave);
+  if (!c) {
+    document.querySelector("main").innerHTML = `<div class="narrow" style="padding:80px 0"><h1>没有这家公司</h1><p style="margin-top:12px"><a class="btn primary" href="index.html#companies">返回公司列表</a></p></div>`;
+    return;
   }
 
-  draw();
-  let t;
-  window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(draw,180)});
-})();
+  document.title = `${c.name} · 周期组Q4精品调研`;
+  document.getElementById("topCode").textContent = c.code;
 
+  const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  function table(head, rows){
+    return `<div class="tblwrap"><table class="tbl">
+      <thead><tr>${head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td class="${i>0 && String(v).length<=12 && /\d/.test(String(v)) ? 'n' : ''}">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div>`;
+  }
 
-/* toc highlight */
-(function(){
-  const links=[...document.querySelectorAll('.toc a[href^="#"]')];
-  const secs=['brief','outline','valuation'].map(id=>document.getElementById(id)).filter(Boolean);
-  if(!secs.length) return;
-  const io=new IntersectionObserver(entries=>{
-    entries.forEach(en=>{
-      if(en.isIntersecting){
-        links.forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+en.target.id));
+  /* ---------- hero ---------- */
+  $("#coHero").innerHTML = `
+    <a class="back" href="index.html#companies">← 返回公司列表</a>
+    <div class="kicker">${esc(c.kicker)}</div>
+    <h1>${esc(c.name)}<small>${esc(c.code)}</small></h1>
+    <p class="sub">${esc(c.tagline)}</p>
+    <div class="meta">${c.stats.map(([v,l])=>`<span><b>${esc(v)}</b>${esc(l)}</span>`).join("")}</div>
+    <div class="meet-line">${esc(c.meet)}</div>`;
+
+  /* ---------- one pager ---------- */
+  $("#briefBody").innerHTML = `
+    <div class="sec"><span class="n">A</span><h2>一页纸</h2><p>公司介绍、发展历史、主要业务、财务、催化、看点、风险</p></div>
+    <div class="co-intro">${c.intro.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+
+    <h3 class="block-h">发展历史</h3>
+    <div class="hist">${c.history.map(([y,t])=>`<div class="hist-row"><span class="hy">${esc(y)}</span><p>${esc(t)}</p></div>`).join("")}</div>
+
+    <h3 class="block-h">主要业务</h3>
+    ${table(c.business.head, c.business.rows)}
+    <div class="note">${esc(c.business.note)}</div>
+
+    <h3 class="block-h">财务业绩</h3>
+    ${table(c.financial.head, c.financial.rows)}
+    <div class="note">${esc(c.financial.note)}</div>
+    <ul class="points">${c.financial.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
+
+    <h3 class="block-h">短期边际催化</h3>
+    ${table(["时间","事件","影响"], c.catalysts)}
+
+    <h3 class="block-h">长期投资看点</h3>
+    <div class="lt-grid">${c.longTerm.map((x,i)=>`<div class="lt-card"><em>0${i+1}</em><h4>${esc(x[0])}</h4><p>${esc(x[1])}</p></div>`).join("")}</div>
+
+    <h3 class="block-h">风险提示</h3>
+    <div class="risk-list">${c.risks.map(x=>`<div><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join("")}</div>
+
+    <h3 class="block-h">估值摘要</h3>
+    <div class="two">
+      <div class="card">${table(["指标","数值","备注"], c.valuation.rows)}</div>
+      <div class="card">${table(["机构","目标价","空间","备注"], c.valuation.targets)}<p class="comment">${esc(c.valuation.comment)}</p></div>
+    </div>`;
+
+  /* ---------- outline ---------- */
+  let qn = 0;
+  $("#outlineBody").innerHTML = `
+    <div class="sec"><span class="n">B</span><h2>调研提纲</h2><p>按现场优先级排，每题带「要拿到」</p></div>
+    <div class="shortcut">
+      <h3>只有 10 分钟，先问这三句</h3>
+      <ol>${c.outlineShort.map(q=>`<li>${esc(q)}</li>`).join("")}</ol>
+    </div>
+    ${c.outline.map((b,i)=>{
+      const qs = b.qs.map(([q,w])=>{
+        qn++;
+        return `<div class="q"><p><span class="no">Q${qn}</span>${esc(q)}</p><div class="want"><b>要拿到</b>：${esc(w)}</div></div>`;
+      }).join("");
+      return `<details class="qbox" ${i===0?"open":""}>
+        <summary><span class="qn">BLOCK ${i+1}</span>${esc(b.title)}<span class="cnt">${b.qs.length} 问</span><span class="arw">▶</span></summary>
+        <div class="qbody">${qs}</div>
+      </details>`;
+    }).join("")}`;
+
+  /* ---------- valuation ---------- */
+  $("#valuationBody").innerHTML = `
+    <div class="sec"><span class="n">C</span><h2>股价与估值</h2><p>日线蜡烛图，悬停看 OHLC</p></div>
+    <div class="kline-card">
+      <div class="kline-top">
+        <div><h3>${esc(c.name)} <small>${esc(c.code)}</small></h3><span>日线 · 前复权 · 港元</span></div>
+        <div class="ranges" id="ranges">
+          ${[["1M",1],["3M",3],["6M",6],["1Y",12],["2Y",24]].map(([label,m])=>`<button data-m="${m}" class="${label==="1Y"?"on":""}">${label}</button>`).join("")}
+        </div>
+      </div>
+      <div class="kline-legend" id="klineLegend"></div>
+      <div id="kline"></div>
+      <div class="kline-foot">数据：Yahoo Finance / 港交所，截至 2026-11-23；红涨绿跌，十字光标看 OHLC。</div>
+    </div>
+    <div class="two" style="margin-top:18px">
+      <div class="card"><h3>估值口径</h3>${table(["指标","数值","备注"], c.valuation.rows)}</div>
+      <div class="card"><h3>卖方目标价</h3>${table(["机构","目标价","空间","备注"], c.valuation.targets)}<p class="comment">${esc(c.valuation.comment)}</p></div>
+    </div>`;
+
+  /* ---------- candlestick ---------- */
+  (function(){
+    const wrap = document.getElementById("kline");
+    const legend = document.getElementById("klineLegend");
+    const rows = (window.KLINE && window.KLINE[c.symbol] && window.KLINE[c.symbol].rows) || [];
+    if (!rows.length) { wrap.innerHTML = '<div class="empty">暂无行情数据</div>'; return; }
+
+    const chart = LightweightCharts.createChart(wrap, {
+      width: wrap.clientWidth,
+      height: window.innerWidth <= 760 ? 320 : 420,
+      layout: { background: { type: "solid", color: "#ffffff" }, textColor: "#5b6b7c", fontSize: 11, fontFamily: "inherit" },
+      grid: { vertLines: { color: "#f1f4f8" }, horzLines: { color: "#f1f4f8" } },
+      crosshair: {
+        mode: LightweightCharts.CrosshairMode.Normal,
+        vertLine: { color: "#9fb0c4", width: 1, style: 2, labelBackgroundColor: "#2b6b59" },
+        horzLine: { color: "#9fb0c4", width: 1, style: 2, labelBackgroundColor: "#2b6b59" }
+      },
+      rightPriceScale: { borderColor: "#e4eaf1", scaleMargins: { top: 0.08, bottom: 0.24 } },
+      timeScale: { borderColor: "#e4eaf1", timeVisible: false, secondsVisible: false, rightOffset: 4 },
+      handleScroll: true, handleScale: true
+    });
+
+    const candle = chart.addCandlestickSeries({
+      upColor: "#c0392b", downColor: "#1e7a5c", borderVisible: false,
+      wickUpColor: "#c0392b", wickDownColor: "#1e7a5c"
+    });
+    const volume = chart.addHistogramSeries({
+      priceFormat: { type: "volume" }, priceScaleId: "vol", lastValueVisible: false, priceLineVisible: false
+    });
+    chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.84, bottom: 0 } });
+
+    const data = rows.map(r=>({ time: r[0], open: r[1], high: r[2], low: r[3], close: r[4] }));
+    const vols = rows.map(r=>({ time: r[0], value: r[5], color: r[4] >= r[1] ? "rgba(192,57,43,.25)" : "rgba(30,122,92,.25)" }));
+    candle.setData(data);
+    volume.setData(vols);
+
+    const idx = new Map(rows.map((r,i)=>[r[0], i]));
+    const fmt = n => Number(n).toFixed(2);
+    const fmtVol = v => v >= 1e6 ? (v/1e6).toFixed(1) + "M" : (v/1e3).toFixed(0) + "K";
+
+    function show(i){
+      const r = rows[i];
+      if (!r) return;
+      const chg = r[4] - r[1], pct = chg / r[1] * 100;
+      const color = chg >= 0 ? "#c0392b" : "#1e7a5c";
+      legend.innerHTML = `<span class="kl-name">${c.name} ${c.code}</span>
+        <span>开 <b>${fmt(r[1])}</b></span><span>高 <b>${fmt(r[2])}</b></span>
+        <span>低 <b>${fmt(r[3])}</b></span><span>收 <b>${fmt(r[4])}</b></span>
+        <span style="color:${color}">${chg >= 0 ? "+" : ""}${fmt(chg)} (${chg >= 0 ? "+" : ""}${pct.toFixed(2)}%)</span>
+        <span class="kl-vol">量 ${fmtVol(r[5])}</span>`;
+    }
+    show(rows.length - 1);
+
+    chart.subscribeCrosshairMove(param=>{
+      if (!param.time) { show(rows.length - 1); return; }
+      const i = idx.get(param.time);
+      if (i !== undefined) show(i);
+    });
+
+    function setRange(months){
+      const to = rows[rows.length - 1][0];
+      const d = new Date(to + "T00:00:00");
+      d.setMonth(d.getMonth() - months);
+      const from = d.toISOString().slice(0, 10);
+      chart.timeScale().setVisibleRange({ from, to });
+    }
+    setRange(12);
+
+    $$("#ranges button").forEach(b=>b.onclick = ()=>{
+      $$("#ranges button").forEach(x=>x.classList.toggle("on", x === b));
+      setRange(parseInt(b.dataset.m, 10));
+    });
+
+    new ResizeObserver(()=>chart.applyOptions({ width: wrap.clientWidth })).observe(wrap);
+  })();
+
+  /* ---------- toc ---------- */
+  (function(){
+    const links = $$('.toc a[href^="#"]');
+    const secs = ["brief","outline","valuation"].map(x=>document.getElementById(x)).filter(Boolean);
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{
+        if (en.isIntersecting) links.forEach(a=>a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id));
+      });
+    }, {rootMargin: "-25% 0px -65% 0px"});
+    secs.forEach(s=>io.observe(s));
+
+    window.addEventListener("load", ()=>{
+      if (location.hash) {
+        const el = document.querySelector(location.hash);
+        if (el) setTimeout(()=>el.scrollIntoView({behavior: "auto", block: "start"}), 80);
       }
     });
-  },{rootMargin:'-25% 0px -65% 0px'});
-  secs.forEach(s=>io.observe(s));
-  /* keep hash target visible under sticky bars */
-  window.addEventListener('load',()=>{
-    if(location.hash){
-      const el=document.querySelector(location.hash);
-      if(el) setTimeout(()=>el.scrollIntoView({behavior:'auto',block:'start'}),60);
-    }
-  });
+  })();
 })();
