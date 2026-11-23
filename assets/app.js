@@ -129,7 +129,6 @@
       <span class="h-tag ${h.tag === "首选" ? "" : "alt"}">${h.tag}</span>
       <h3>${h.name}<small>${h.en}</small></h3>
       <div class="h-addr">${h.area} · ${h.addr}</div>
-      <div class="h-price">${h.price}<small>${h.priceNote}</small></div>
       <p>${h.why}</p>
       <div class="h-dist">${h.dist.map(d=>`<div><span>${d[0]}</span><b>${d[1]}</b></div>`).join("")}</div>
     </article>`).join("");
@@ -183,4 +182,8 @@
 
   /* ---------- boot ---------- */
   setDay(1, false);
+  const coParam = new URLSearchParams(location.search).get("co");
+  if (coParam && window.COMPANIES && window.COMPANIES[coParam]) {
+    setTimeout(()=>openCompany(coParam), 180);
+  }
 })();
