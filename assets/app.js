@@ -46,6 +46,11 @@
     markers[s.id] = m;
   });
 
+  function timeText(s){
+    if(!s.end) return s.time;
+    return s.time + (/^\d{2}:\d{2}$/.test(s.end) ? '–' + s.end : ' ' + s.end);
+  }
+
   function detailHTML(s){
     let actions = '';
     if (s.links) {
@@ -62,7 +67,7 @@
       </div>`;
     }
     const dayLabel = s.day === 1 ? '12/2 周三' : '12/3 周四';
-    return `<div class="sd-time">${dayLabel} ${s.time}${s.end ? '–' + s.end : ''}</div>
+    return `<div class="sd-time">${dayLabel} ${timeText(s)}</div>
       <div class="sd-name">${s.name}${s.code ? `<small>${s.code}</small>` : ''}</div>
       <div class="sd-addr">${s.addr}</div>
       <div class="sd-note">${s.note}</div>${actions}`;
@@ -89,7 +94,7 @@
   function renderList(){
     const rows = T.stops.filter(s=>s.day === day).map(s=>`
       <div class="stop-row ${s.type}" data-id="${s.id}">
-        <div class="t"><b>${s.time}</b>${s.end || ''}</div>
+        <div class="t"><b>${s.time}</b>${s.end ? ( /^\d{2}:\d{2}$/.test(s.end) ? '–' + s.end : ' ' + s.end) : ''}</div>
         <div class="nm">${s.name}<span>${s.sub || s.addr}</span></div>
         <span class="dot"></span>
       </div>`).join('');
