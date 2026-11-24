@@ -10,26 +10,66 @@
     return s.time + (/^\d{2}:\d{2}$/.test(s.end) ? "–" + s.end : " " + s.end);
   }
 
+  /* ---------- WGS84 → GCJ-02（高德底图） ---------- */
+  function outOfChina(lng, lat){ return (lng < 72.004 || lng > 137.8347) || (lat < 0.8293 || lat > 55.8271); }
+  function transformLat(x, y){
+    let r = -100 + 2*x + 3*y + 0.2*y*y + 0.1*x*y + 0.2*Math.sqrt(Math.abs(x));
+    r += (20*Math.sin(6*x*Math.PI) + 20*Math.sin(2*x*Math.PI)) * 2/3;
+    r += (20*Math.sin(y*Math.PI) + 40*Math.sin(y/3*Math.PI)) * 2/3;
+    r += (160*Math.sin(y/12*Math.PI) + 320*Math.sin(y*Math.PI/30)) * 2/3;
+    return r;
+  }
+  function transformLng(x, y){
+    let r = 300 + x + 2*y + 0.1*x*x + 0.1*x*y + 0.1*Math.sqrt(Math.abs(x));
+    r += (20*Math.sin(6*x*Math.PI) + 20*Math.sin(2*x*Math.PI)) * 2/3;
+    r += (20*Math.sin(x*Math.PI) + 40*Math.sin(x/3*Math.PI)) * 2/3;
+    r += (150*Math.sin(x/12*Math.PI) + 300*Math.sin(x/30*Math.PI)) * 2/3;
+    return r;
+  }
+  function wgs84ToGcj02(lat, lng){
+    if (outOfChina(lng, lat)) return [lat, lng];
+    let dLat = transformLat(lng - 105, lat - 35);
+    let dLng = transformLng(lng - 105, lat - 35);
+    const rad = lat / 180 * Math.PI;
+    let magic = Math.sin(rad);
+    magic = 1 - 0.00669342162296594323 * magic * magic;
+    const sq = Math.sqrt(magic);
+    dLat = (dLat * 180) / ((6378245 * (1 - 0.00669342162296594323)) / (magic * sq) * Math.PI);
+    dLng = (dLng * 180) / (6378245 / sq * Math.cos(rad) * Math.PI);
+    return [lat + dLat, lng + dLng];
+  }
+  let datum = "gcj";
+  const project = (lat, lng) => datum === "gcj" ? wgs84ToGcj02(lat, lng) : [lat, lng];
+
   /* ---------- map ---------- */
   const map = L.map("map", {
     zoomControl: true,
     scrollWheelZoom: false,
     zoomSnap: 0.5,
     attributionControl: true
-  }).setView([22.287, 114.185], 13);
+  }).setView(project(22.287, 114.185), 13);
 
-  const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19, attribution: "&copy; OpenStreetMap contributors"
+  const amap = L.tileLayer("https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}", {
+    subdomains: "1234", minZoom: 10, maxZoom: 18,
+    attribution: '&copy; <a href="https://www.amap.com/" target="_blank">高德地图</a>'
   }).addTo(map);
 
-  let tileErr = 0;
-  osm.on("tileerror", function(){
-    if (++tileErr >= 4) {
-      map.removeLayer(osm);
-      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-        maxZoom: 16, attribution: "Tiles &copy; Esri"
-      }).addTo(map);
-    }
+  let tileErr = 0, fallback = false;
+  amap.on("tileerror", function(){
+    if (fallback || ++tileErr < 6) return;
+    fallback = true;
+    map.removeLayer(amap);
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 16, attribution: "Tiles &copy; Esri"
+    }).addTo(map);
+    datum = "wgs";
+    Object.entries(markers).forEach(([id, m])=>{
+      const st = T.stops.find(x=>x.id === id);
+      if (st) m.setLatLng(project(st.lat, st.lng));
+    });
+    const src = document.getElementById("mapSrc");
+    if (src) src.textContent = "底图 © Esri";
+    if (typeof setDay === "function") setDay(currentDay, true);
   });
 
   const layer = L.layerGroup().addTo(map);
@@ -55,7 +95,7 @@
   }
 
   T.stops.filter(s => s.map !== false).forEach(s=>{
-    const m = L.marker([s.lat, s.lng], {icon: pinIcon(s), riseOnHover: true});
+    const m = L.marker(project(s.lat, s.lng), {icon: pinIcon(s), riseOnHover: true});
     m.bindPopup(popupHTML(s), {maxWidth: 300, className: "co-popup", offset: [0, -4]});
     markers[s.id] = m;
   });
@@ -65,8 +105,9 @@
     T.stops.filter(s => s.map !== false).forEach(s=>{
       if (s.day !== currentDay && s.type !== "hotel") return;
       const label = s.type === "hotel" ? "住 · 维港凯悦尚萃" : `${s.time} ${s.name}`;
+      const permanent = currentDay === 1 || s.type === "hotel";
       markers[s.id].bindTooltip(label, {
-        permanent: true, direction: "top", className: "map-tip", offset: [0, -12], opacity: 1
+        permanent, direction: "top", className: "map-tip", offset: [0, -12], opacity: 1
       });
     });
   }
@@ -80,7 +121,7 @@
       markers[s.id].setIcon(pinIcon(s));
       markers[s.id].addTo(layer);
     });
-    const pts = T.stops.filter(s => s.map !== false && s.day === d).map(s=>[s.lat, s.lng]);
+    const pts = T.stops.filter(s => s.map !== false && s.day === d).map(s=>project(s.lat, s.lng));
     if (pts.length) map.fitBounds(L.latLngBounds(pts), {padding: [50, 50], maxZoom: d === 1 ? 13.5 : 14});
     bindTips();
   }
@@ -93,9 +134,9 @@
     if (!m) return;
     if (window.innerWidth <= 960) {
       $("#map").scrollIntoView({behavior: "smooth", block: "center"});
-      setTimeout(()=>{ map.flyTo([s.lat, s.lng], 15.5, {duration: .5}); m.openPopup(); }, 380);
+      setTimeout(()=>{ map.flyTo(project(s.lat, s.lng), 15.5, {duration: .5}); m.openPopup(); }, 380);
     } else {
-      map.flyTo([s.lat, s.lng], 15.5, {duration: .6});
+      map.flyTo(project(s.lat, s.lng), 15.5, {duration: .6});
       setTimeout(()=>m.openPopup(), 420);
     }
     $$(".tl-row").forEach(r=>r.classList.toggle("on", r.dataset.id === id));
