@@ -44,7 +44,11 @@
   /* ---------- map ---------- */
   const map = L.map("map", {
     zoomControl: true,
-    scrollWheelZoom: false,
+    scrollWheelZoom: true,
+    doubleClickZoom: true,
+    touchZoom: true,
+    boxZoom: true,
+    keyboard: true,
     zoomSnap: 0.5,
     attributionControl: true
   }).setView(project(22.287, 114.185), 13);
@@ -176,7 +180,7 @@
 
   /* ---------- company cards ---------- */
   $("#companyGrid").innerHTML = T.companies.map(c=>`
-    <article class="co-card ${c.center ? "center" : ""}" data-co="${c.id}">
+    <article class="co-card" data-co="${c.id}">
       <div class="when">${c.when}</div>
       <h3>${c.name}<small>${c.code}</small></h3>
       <p>${c.line}</p>

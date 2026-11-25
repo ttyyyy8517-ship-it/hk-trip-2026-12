@@ -156,10 +156,11 @@ h1{font-size:46px;line-height:1.15;letter-spacing:-1.3px;margin:13px 0 14px;font
 .mp-btn{display:inline-block;margin-top:8px;font-size:10.5px;color:var(--blue);font-weight:600}
 
 /* ============ company cards ============ */
-.co-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.co-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);transition:.18s;display:flex;flex-direction:column}
+.co-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.co-card{grid-column:span 3;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);transition:.18s;display:flex;flex-direction:column}
+.co-card:nth-child(n+5){grid-column:span 4}
 .co-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:#c9dcd6}
-.co-card.center{grid-column:2}
+
 .co-card .when{font-family:Georgia,serif;font-size:10.5px;color:var(--muted);letter-spacing:.3px}
 .co-card h3{font-size:17px;font-weight:700;margin:7px 0 2px;letter-spacing:-.3px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
 .co-card h3 small{font-family:Georgia,serif;font-size:9.5px;color:var(--muted);font-weight:400;letter-spacing:.3px}
@@ -287,7 +288,8 @@ h1{font-size:46px;line-height:1.15;letter-spacing:-1.3px;margin:13px 0 14px;font
   #map{min-height:420px;height:420px}
   .map-right{border-left:0;border-top:1px solid var(--line)}
   .co-grid{grid-template-columns:1fr 1fr}
-  .co-card.center{grid-column:1/-1;justify-self:center;width:calc(50% - 8px)}
+  .co-card,.co-card:nth-child(n+5){grid-column:auto}
+  .co-card:last-child{grid-column:1/-1}
   .two{grid-template-columns:1fr}
   .lt-grid{grid-template-columns:1fr}
   .risk-list{grid-template-columns:1fr}
@@ -307,7 +309,7 @@ h1{font-size:46px;line-height:1.15;letter-spacing:-1.3px;margin:13px 0 14px;font
   .sec{flex-wrap:wrap;gap:7px}
   .sec p{margin-left:0;width:100%}
   .co-grid{grid-template-columns:1fr}
-  .co-card.center{grid-column:auto;justify-self:stretch;width:auto}
+  .co-card,.co-card:nth-child(n+5),.co-card:last-child{grid-column:auto}
   .map-head{padding:13px 15px 11px}
   #map{min-height:360px;height:360px}
   .timeline{padding:4px 10px 14px}
