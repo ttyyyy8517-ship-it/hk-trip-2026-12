@@ -54,15 +54,14 @@
     const cons = c.consensus ? `<div class="tblwrap"><table class="tbl">
       <thead><tr>${c.consensus.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead>
       <tbody>${c.consensus.rows.map(r=>`<tr>${r.map((v,i)=>`<td class="${i>0 && String(v).length<=14 && /\d/.test(String(v)) ? "n" : ""}">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>
-    </table></div><div class="note">${esc(c.consensus.note)}</div>` : '<div class="empty">一致预期待补</div>';
+    </table></div>${c.consensus.note ? `<div class="note">${esc(c.consensus.note)}</div>` : ""}` : '<div class="empty">一致预期待补</div>';
     const trend = c.trend ? `<div class="trend-grid">${c.trend.series.map(s=>`
       <div class="trend-card"><div class="trend-h"><b>${esc(s.name)}</b><span>${esc(s.unit)}</span></div>${barChart(s, c.trend.labels)}</div>`).join("")}</div>` : '<div class="empty">财务趋势待补</div>';
     const fal = c.falsify ? table(["证伪条件","阈值 / 时间","动作"], c.falsify) : '<div class="empty">证伪清单待补</div>';
     const trendNote = c.trend && c.trend.note ? `<div class="note">${esc(c.trend.note)}</div>` : "";
     const latest = c.latest && c.latest.length ? `<h3 class="block-h">最新经营数据</h3><ul class="points">${c.latest.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : "";
-    const peers = c.peers ? `<h3 class="block-h">同业估值</h3>${table(c.peers.head, c.peers.rows)}<div class="note">${esc(c.peers.note || "")}</div>` : "";
-    return `<div class="data-note">数据底稿：一致预期来自 brm，财务数据来自公司财报，证伪阈值为研究员设定；行情截至 2026-11-24。</div>
-      <h3 class="block-h">一致预期</h3>${cons}
+    const peers = c.peers ? `<h3 class="block-h">同业估值</h3>${table(c.peers.head, c.peers.rows)}${c.peers.note ? `<div class="note">${esc(c.peers.note)}</div>` : ""}` : "";
+    return `<h3 class="block-h">一致预期</h3>${cons}
       <h3 class="block-h">财务趋势</h3>${trend}${trendNote}
       <h3 class="block-h">证伪与跟踪</h3>${fal}
       ${latest}
@@ -127,7 +126,7 @@
         <div class="kline-foot">数据：Yahoo Finance / 港交所，截至 ${c.klineAsOf || "2026-11-24"}；红涨绿跌，十字光标看 OHLC。</div>
       </div>
       <div class="two" style="margin-top:18px">
-        <div class="card"><h3>估值口径</h3>${table(["指标","数值","备注"], c.valuation.rows)}</div>
+        <div class="card"><h3>估值</h3>${table(["指标","数值","备注"], c.valuation.rows)}</div>
         <div class="card"><h3>卖方目标价</h3>${table(["机构","目标价","空间","备注"], c.valuation.targets)}<p class="comment">${esc(c.valuation.comment)}</p></div>
       </div>`;
   }
