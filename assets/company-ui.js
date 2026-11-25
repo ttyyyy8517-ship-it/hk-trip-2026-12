@@ -71,7 +71,7 @@
         </div>
         <div class="kline-legend" id="klineLegend"></div>
         <div id="kline"></div>
-        <div class="kline-foot">数据：Yahoo Finance / 港交所，截至 ${c.klineAsOf || "2026-11-23"}；红涨绿跌，十字光标看 OHLC。</div>
+        <div class="kline-foot">数据：Yahoo Finance / 港交所，截至 ${c.klineAsOf || "2026-11-24"}；红涨绿跌，十字光标看 OHLC。</div>
       </div>
       <div class="two" style="margin-top:18px">
         <div class="card"><h3>估值口径</h3>${table(["指标","数值","备注"], c.valuation.rows)}</div>
@@ -106,14 +106,16 @@
     chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.84, bottom: 0 } });
 
     candle.setData(rows.map(r=>({ time: r[0], open: r[1], high: r[2], low: r[3], close: r[4] })));
-    volume.setData(rows.map(r=>({ time: r[0], value: r[5], color: r[4] >= r[1] ? "rgba(192,57,43,.25)" : "rgba(30,122,92,.25)" })));
+    volume.setData(rows.map((r,i)=>({ time: r[0], value: r[5], color: r[4] >= (i > 0 ? rows[i-1][4] : r[1]) ? "rgba(192,57,43,.25)" : "rgba(30,122,92,.25)" })));
 
     const idx = new Map(rows.map((r,i)=>[r[0], i]));
-    const fmt = n => Number(n).toFixed(2);
     const fmtVol = v => v >= 1e6 ? (v/1e6).toFixed(1) + "M" : (v/1e3).toFixed(0) + "K";
     function show(i){
       const r = rows[i]; if (!r) return;
-      const chg = r[4] - r[1], pct = chg / r[1] * 100;
+      const prev = i > 0 ? rows[i-1][4] : r[1];
+      const dec = Math.abs(r[4]) < 5 ? 3 : 2;
+      const fmt = n => Number(n).toFixed(dec);
+      const chg = r[4] - prev, pct = chg / prev * 100;
       const color = chg >= 0 ? "#c0392b" : "#1e7a5c";
       legend.innerHTML = `<span class="kl-name">${esc(c.name)} ${esc(c.code)}</span>
         <span>开 <b>${fmt(r[1])}</b></span><span>高 <b>${fmt(r[2])}</b></span>
