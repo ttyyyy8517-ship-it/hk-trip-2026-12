@@ -176,7 +176,7 @@
 
   /* ---------- company cards ---------- */
   $("#companyGrid").innerHTML = T.companies.map(c=>`
-    <article class="co-card" data-co="${c.id}">
+    <article class="co-card ${c.center ? "center" : ""}" data-co="${c.id}">
       <div class="when">${c.when}</div>
       <h3>${c.name}<small>${c.code}</small></h3>
       <p>${c.line}</p>
