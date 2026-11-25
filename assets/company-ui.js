@@ -16,6 +16,59 @@
     if (ro) { try { ro.disconnect(); } catch(e){} ro = null; }
   }
 
+  function fmtNum(v, unit){
+    if (unit === "%") return v.toFixed(1) + "%";
+    if (Math.abs(v) >= 1000) return Math.round(v).toLocaleString("en-US");
+    if (Math.abs(v) < 10) return v.toFixed(2);
+    return v.toFixed(1);
+  }
+  function barChart(series, labels){
+    const vals = series.values.map(v => v === null || v === undefined ? null : Number(v));
+    const nums = vals.filter(v => v !== null);
+    const max = Math.max(...nums, 0), min = Math.min(...nums, 0);
+    const range = max - min || 1;
+    const W = 320, H = 120, padX = 16, padTop = 20, padBot = 24;
+    const baseY = padTop + (max / range) * (H - padTop - padBot);
+    const step = (W - padX * 2) / vals.length;
+    const bw = Math.min(38, step * 0.56);
+    const bars = vals.map((v, i) => {
+      const cx = padX + step * i + step / 2;
+      if (v === null) return `<text x="${cx}" y="${baseY - 6}" text-anchor="middle" font-size="9" fill="#9aa7b6">—</text>`;
+      const h = Math.abs(v) / range * (H - padTop - padBot);
+      const y = v >= 0 ? padTop + (max - v) / range * (H - padTop - padBot) : baseY;
+      const fill = v >= 0 ? "#2e548f" : "#c0392b";
+      const ty = v >= 0 ? Math.max(10, y - 5) : Math.min(H - 20, y + h + 11);
+      return `<rect x="${cx - bw/2}" y="${y}" width="${bw}" height="${Math.max(1,h)}" rx="2" fill="${fill}" opacity=".82"/>
+        <text x="${cx}" y="${ty}" text-anchor="middle" font-size="8.5" fill="#5b6b7c">${fmtNum(v, series.unit)}</text>`;
+    }).join("");
+    const labs = labels.map((l, i) => {
+      const cx = padX + step * i + step / 2;
+      return `<text x="${cx}" y="${H - 6}" text-anchor="middle" font-size="8.5" fill="#9aa7b6">${esc(l)}</text>`;
+    }).join("");
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+      <line x1="${padX}" y1="${baseY}" x2="${W-padX}" y2="${baseY}" stroke="#e6ebf1" stroke-width="1"/>
+      ${bars}${labs}
+    </svg>`;
+  }
+  function dataHTML(c){
+    const cons = c.consensus ? `<div class="tblwrap"><table class="tbl">
+      <thead><tr>${c.consensus.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead>
+      <tbody>${c.consensus.rows.map(r=>`<tr>${r.map((v,i)=>`<td class="${i>0 && String(v).length<=14 && /\d/.test(String(v)) ? "n" : ""}">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div><div class="note">${esc(c.consensus.note)}</div>` : '<div class="empty">一致预期待补</div>';
+    const trend = c.trend ? `<div class="trend-grid">${c.trend.series.map(s=>`
+      <div class="trend-card"><div class="trend-h"><b>${esc(s.name)}</b><span>${esc(s.unit)}</span></div>${barChart(s, c.trend.labels)}</div>`).join("")}</div>` : '<div class="empty">财务趋势待补</div>';
+    const fal = c.falsify ? table(["证伪条件","阈值 / 时间","动作"], c.falsify) : '<div class="empty">证伪清单待补</div>';
+    const trendNote = c.trend && c.trend.note ? `<div class="note">${esc(c.trend.note)}</div>` : "";
+    const latest = c.latest && c.latest.length ? `<h3 class="block-h">最新经营数据</h3><ul class="points">${c.latest.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : "";
+    const peers = c.peers ? `<h3 class="block-h">同业估值</h3>${table(c.peers.head, c.peers.rows)}<div class="note">${esc(c.peers.note || "")}</div>` : "";
+    return `<div class="data-note">数据底稿：一致预期来自 brm，财务数据来自公司财报，证伪阈值为研究员设定；行情截至 2026-11-24。</div>
+      <h3 class="block-h">一致预期</h3>${cons}
+      <h3 class="block-h">财务趋势</h3>${trend}${trendNote}
+      <h3 class="block-h">证伪与跟踪</h3>${fal}
+      ${latest}
+      ${peers}`;
+  }
+
   function briefHTML(c){
     return `
       <div class="co-intro">${c.intro.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
@@ -161,6 +214,7 @@
         <button data-tab="brief" class="on">一页纸</button>
         <button data-tab="outline">调研提纲</button>
         <button data-tab="valuation">股价与估值</button>
+        <button data-tab="data">数据底稿</button>
       </div>
       <div class="co-panel-body" id="coPanelBody"></div>`;
     const body = host.querySelector("#coPanelBody");
@@ -170,7 +224,7 @@
       tabs.forEach(x=>x.classList.toggle("on", x === btn));
       destroyChart();
       const tab = btn.dataset.tab;
-      body.innerHTML = tab === "brief" ? briefHTML(c) : tab === "outline" ? outlineHTML(c) : valuationHTML(c);
+      body.innerHTML = tab === "brief" ? briefHTML(c) : tab === "outline" ? outlineHTML(c) : tab === "valuation" ? valuationHTML(c) : dataHTML(c);
       if (tab === "valuation") initKline(c, body);
     });
   }
