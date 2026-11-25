@@ -50,22 +50,25 @@
       ${bars}${labs}
     </svg>`;
   }
-  function dataHTML(c){
-    const cons = c.consensus ? `<div class="tblwrap"><table class="tbl">
+  function consensusHTML(c){
+    if (!c.consensus) return "";
+    return `<div class="tblwrap"><table class="tbl">
       <thead><tr>${c.consensus.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead>
       <tbody>${c.consensus.rows.map(r=>`<tr>${r.map((v,i)=>`<td class="${i>0 && String(v).length<=14 && /\d/.test(String(v)) ? "n" : ""}">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>
-    </table></div>${c.consensus.note ? `<div class="note">${esc(c.consensus.note)}</div>` : ""}` : '<div class="empty">一致预期待补</div>';
-    const trend = c.trend ? `<div class="trend-grid">${c.trend.series.map(s=>`
-      <div class="trend-card"><div class="trend-h"><b>${esc(s.name)}</b><span>${esc(s.unit)}</span></div>${barChart(s, c.trend.labels)}</div>`).join("")}</div>` : '<div class="empty">财务趋势待补</div>';
-    const fal = c.falsify ? table(["证伪条件","阈值 / 时间","动作"], c.falsify) : '<div class="empty">证伪清单待补</div>';
-    const trendNote = c.trend && c.trend.note ? `<div class="note">${esc(c.trend.note)}</div>` : "";
-    const latest = c.latest && c.latest.length ? `<h3 class="block-h">最新经营数据</h3><ul class="points">${c.latest.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : "";
-    const peers = c.peers ? `<h3 class="block-h">同业估值</h3>${table(c.peers.head, c.peers.rows)}${c.peers.note ? `<div class="note">${esc(c.peers.note)}</div>` : ""}` : "";
-    return `<h3 class="block-h">一致预期</h3>${cons}
-      <h3 class="block-h">财务趋势</h3>${trend}${trendNote}
-      <h3 class="block-h">证伪与跟踪</h3>${fal}
-      ${latest}
-      ${peers}`;
+    </table></div>${c.consensus.note ? `<div class="note">${esc(c.consensus.note)}</div>` : ""}`;
+  }
+  function trendHTML(c){
+    if (!c.trend) return "";
+    return `<div class="trend-grid">${c.trend.series.map(s=>`
+      <div class="trend-card"><div class="trend-h"><b>${esc(s.name)}</b><span>${esc(s.unit)}</span></div>${barChart(s, c.trend.labels)}</div>`).join("")}</div>`;
+  }
+  function latestHTML(c){
+    if (!c.latestBrief || !c.latestBrief.length) return "";
+    return `<ul class="points">${c.latestBrief.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+  }
+  function peersHTML(c){
+    if (!c.peers) return "";
+    return table(c.peers.head, c.peers.rows);
   }
 
   function briefHTML(c){
@@ -80,6 +83,9 @@
       ${table(c.financial.head, c.financial.rows)}
       <div class="note">${esc(c.financial.note)}</div>
       <ul class="points">${c.financial.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
+      ${c.consensus ? `<h3 class="block-h">一致预期</h3>${consensusHTML(c)}` : ""}
+      ${c.trend ? `<h3 class="block-h">财务趋势</h3>${trendHTML(c)}` : ""}
+      ${c.latestBrief ? `<h3 class="block-h">最新数据</h3>${latestHTML(c)}` : ""}
       <h3 class="block-h">短期边际催化</h3>
       ${table(["时间","事件","影响"], c.catalysts)}
       <h3 class="block-h">长期投资看点</h3>
@@ -90,7 +96,8 @@
       <div class="two">
         <div class="card">${table(["指标","数值","备注"], c.valuation.rows)}</div>
         <div class="card">${table(["机构","目标价","空间","备注"], c.valuation.targets)}<p class="comment">${esc(c.valuation.comment)}</p></div>
-      </div>`;
+      </div>
+      ${c.peers ? `<h3 class="block-h">同业估值</h3>${peersHTML(c)}` : ""}`;
   }
 
   function outlineHTML(c){
@@ -213,7 +220,6 @@
         <button data-tab="brief" class="on">一页纸</button>
         <button data-tab="outline">调研提纲</button>
         <button data-tab="valuation">股价与估值</button>
-        <button data-tab="data">数据底稿</button>
       </div>
       <div class="co-panel-body" id="coPanelBody"></div>`;
     const body = host.querySelector("#coPanelBody");
@@ -223,7 +229,7 @@
       tabs.forEach(x=>x.classList.toggle("on", x === btn));
       destroyChart();
       const tab = btn.dataset.tab;
-      body.innerHTML = tab === "brief" ? briefHTML(c) : tab === "outline" ? outlineHTML(c) : tab === "valuation" ? valuationHTML(c) : dataHTML(c);
+      body.innerHTML = tab === "brief" ? briefHTML(c) : tab === "outline" ? outlineHTML(c) : valuationHTML(c);
       if (tab === "valuation") initKline(c, body);
     });
   }
