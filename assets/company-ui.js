@@ -130,7 +130,7 @@
         </div>
         <div class="kline-legend" id="klineLegend"></div>
         <div id="kline"></div>
-        <div class="kline-foot">数据：Yahoo Finance / 港交所，截至 ${c.klineAsOf || "2026-11-24"}；红涨绿跌，十字光标看 OHLC。</div>
+        <div class="kline-foot">数据：Yahoo Finance / 港交所，截至 ${c.klineAsOf || "2026-11-27"}；红涨绿跌，十字光标看 OHLC。</div>
       </div>
       <div class="two" style="margin-top:18px">
         <div class="card"><h3>估值</h3>${table(["指标","数值","备注"], c.valuation.rows)}</div>
