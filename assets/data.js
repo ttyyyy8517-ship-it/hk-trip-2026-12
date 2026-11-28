@@ -47,17 +47,11 @@ window.TRIP = {
     {
       id: "wkl", day: 1, type: "arrive", badge: "西", time: "13:23", end: "抵达",
       name: "香港西九龙站", sub: "西九龙站，一地两检", addr: "西九龙站，一地两检",
-      note: "通关预留 20–30 分钟，13:50 前后出站；西九龙站/圆方午餐，14:30 去太古坊。",
+      note: "通关预留 20–30 分钟，13:50 前后出站，直接去太古坊；15:15 到港岛东中心登记。",
       lat: 22.3049, lng: 114.1660
     },
     {
-      id: "lunch", day: 1, type: "lunch", badge: "餐", time: "13:50", end: "14:30",
-      name: "西九龙站附近午餐", sub: "圆方 / 西九龙站", addr: "香港西九龙站圆方",
-      note: "通关后在西九龙站或圆方用餐，14:30 出发去太古坊；15:30 太古地产。",
-      map: false
-    },
-    {
-      id: "taikoo-go", day: 1, type: "move", badge: "行", time: "14:30", end: "15:10",
+      id: "taikoo-go", day: 1, type: "move", badge: "行", time: "14:00", end: "14:40",
       name: "前往太古坊", sub: "西九龙 → 港岛东", addr: "西九龙站 → 太古坊",
       note: "打车约 30–40 分钟；15:15 到港岛东中心登记，15:30 太古地产。",
       map: false
