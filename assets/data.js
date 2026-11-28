@@ -33,31 +33,31 @@ window.TRIP = {
   ],
   stops: [
     {
-      id: "futian", day: 1, type: "move", badge: "福", time: "11:30", end: "集合",
+      id: "futian", day: 1, type: "move", badge: "福", time: "12:30", end: "集合",
       name: "福田站集合", sub: "深圳福田站", addr: "深圳福田站候车厅",
-      note: "11:30 候车厅集合，11:50 进闸；G6519 12:06 发车。",
+      note: "12:30 候车厅集合，12:50 进闸；G5857 13:09 发车。",
       map: false
     },
     {
-      id: "train", day: 1, type: "move", badge: "车", time: "12:06", end: "12:20",
-      name: "G6519 福田 → 西九龙", sub: "14 分钟", addr: "福田站 → 香港西九龙站",
-      note: "11:50 进闸；西九龙一地两检，通关预留 20–30 分钟。",
+      id: "train", day: 1, type: "move", badge: "车", time: "13:09", end: "13:23",
+      name: "G5857 福田 → 西九龙", sub: "14 分钟", addr: "福田站 → 香港西九龙站",
+      note: "12:50 进闸；西九龙一地两检，通关预留 20–30 分钟。",
       map: false
     },
     {
-      id: "wkl", day: 1, type: "arrive", badge: "西", time: "12:20", end: "抵达",
+      id: "wkl", day: 1, type: "arrive", badge: "西", time: "13:23", end: "抵达",
       name: "香港西九龙站", sub: "西九龙站，一地两检", addr: "西九龙站，一地两检",
-      note: "通关预留 20–30 分钟，12:50 前后出站；西九龙站/圆方午餐，14:00 去太古坊。",
+      note: "通关预留 20–30 分钟，13:50 前后出站；西九龙站/圆方午餐，14:30 去太古坊。",
       lat: 22.3049, lng: 114.1660
     },
     {
-      id: "lunch", day: 1, type: "lunch", badge: "餐", time: "12:50", end: "13:50",
+      id: "lunch", day: 1, type: "lunch", badge: "餐", time: "13:50", end: "14:30",
       name: "西九龙站附近午餐", sub: "圆方 / 西九龙站", addr: "香港西九龙站圆方",
-      note: "通关后在西九龙站或圆方用餐，14:00 出发去太古坊；15:30 太古地产。",
+      note: "通关后在西九龙站或圆方用餐，14:30 出发去太古坊；15:30 太古地产。",
       map: false
     },
     {
-      id: "taikoo-go", day: 1, type: "move", badge: "行", time: "14:00", end: "14:40",
+      id: "taikoo-go", day: 1, type: "move", badge: "行", time: "14:30", end: "15:10",
       name: "前往太古坊", sub: "西九龙 → 港岛东", addr: "西九龙站 → 太古坊",
       note: "打车约 30–40 分钟；15:15 到港岛东中心登记，15:30 太古地产。",
       map: false
@@ -124,15 +124,16 @@ window.TRIP = {
     }
   ],
   flights: [
-    { city: "北京", date: "12/1 周二", time: "16:00", airport: "首都机场", flight: "国航 CA1337", to: "深圳宝安", note: "建议提前一晚到深圳" },
-    { city: "北京", date: "12/2 周三", time: "06:30", airport: "首都机场", flight: "国航 CA1393", to: "深圳宝安", note: "06:30–10:10，赶 12:06 高铁；建议 1 日先到" },
-    { city: "上海", date: "12/1 周二", time: "15:55", airport: "虹桥机场", flight: "东航 MU5349", to: "深圳宝安", note: "建议提前一晚到深圳" },
-    { city: "上海", date: "12/2 周三", time: "07:30", airport: "虹桥机场", flight: "东航 MU5345", to: "深圳宝安", note: "07:30–10:05，赶 12:06 高铁；建议 1 日先到" }
+    { city: "北京", date: "12/1 周二", time: "16:00", airport: "首都机场", flight: "国航 CA1337", to: "深圳宝安", note: "12/1 到深圳" },
+    { city: "北京", date: "12/2 周三", time: "07:30", airport: "首都机场", flight: "深航 ZH9116", to: "深圳宝安", note: "07:30–10:55；13:09 G5857" },
+    { city: "上海", date: "12/1 周二", time: "15:55", airport: "虹桥机场", flight: "东航 MU5349", to: "深圳宝安", note: "12/1 到深圳" },
+    { city: "上海", date: "12/2 周三", time: "07:55", airport: "浦东机场", flight: "国航 CA1893", to: "深圳宝安", note: "07:55–10:30；13:09 G5857" },
+    { city: "上海", date: "12/2 周三", time: "07:55", airport: "虹桥机场", flight: "南航 CZ3590", to: "深圳宝安", note: "07:55–10:30；13:09 G5857" }
   ],
   rail: {
-    date: "12/2 周三", time: "12:06", train: "G6519", from: "福田站", to: "香港西九龙",
+    date: "12/2 周三", time: "13:09", train: "G5857", from: "福田站", to: "香港西九龙",
     dur: "14 分钟",
-    note: "11:30 福田站候车厅集合，11:50 进闸；西九龙一地两检预留 20–30 分钟。"
+    note: "12:30 福田站候车厅集合，12:50 进闸；西九龙一地两检预留 20–30 分钟。"
   },
   companies: [
     { id: "taikoo", name: "太古地产", code: "1972.HK", when: "12/2 周三 15:30", line: "租金还在跌、股价已经涨；问港写租金底、内地同店、股息来源。" },
